@@ -1,0 +1,10 @@
+### JetBrains ###
+.idea/
+
+### Development ###
+*.env
+tmp/
+
+### Python ###
+__pychache__/
+.venv/
