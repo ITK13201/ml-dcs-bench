@@ -83,5 +83,5 @@ jobs:
             ${{ env.project_name }}_${{ github.ref_name }}_windows_amd64.tar.gz
             ${{ env.project_name }}_${{ github.ref_name }}_macos_amd64.tar.gz
             ${{ env.project_name }}_${{ github.ref_name }}_linux_amd64.tar.gz
-        generate_release_notes: true
-        make_latest: true
+          generate_release_notes: true
+          make_latest: true
