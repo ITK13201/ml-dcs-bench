@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: "actions/checkout@v4"
+        uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -49,25 +49,30 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Download Windows Build
         uses: actions/download-artifact@v4
         with:
           name: Windows Build
-          path: ./windows/${{ env.project_name }}.exe
+          path: ./windows
       - name: Download MacOS Build
         uses: actions/download-artifact@v4
         with:
           name: macOS Build
-          path: ./macos/${{ env.project_name }}
+          path: ./macos
       - name: Download Linux Build
         uses: actions/download-artifact@v4
         with:
           name: Linux Build
-          path: ./linux/${{ env.project_name }}
+          path: ./linux
       - name: Display structure of downloaded files
         run: ls -R
-      - name: Compress
+      - name: Rename & Compress
         run: |
+          mv ./windows/main.exe ./windows/${{ env.project_name }}.exe
+          mv ./macos/main.bin ./macos/${{ env.project_name }}
+          mv ./linux/main.bin ./linux/${{ env.project_name }}
           tar -C ./windows -pczvf ${{ env.project_name }}_${{ github.ref_name }}_windows_amd64.tar.gz ${{ env.project_name }}.exe
           tar -C ./macos -pczvf ${{ env.project_name }}_${{ github.ref_name }}_macos_amd64.tar.gz ${{ env.project_name }}
           tar -C ./linux -pczvf ${{ env.project_name }}_${{ github.ref_name }}_linux_amd64.tar.gz ${{ env.project_name }}
@@ -78,3 +83,5 @@ jobs:
             ${{ env.project_name }}_${{ github.ref_name }}_windows_amd64.tar.gz
             ${{ env.project_name }}_${{ github.ref_name }}_macos_amd64.tar.gz
             ${{ env.project_name }}_${{ github.ref_name }}_linux_amd64.tar.gz
+        generate_release_notes: true
+        make_latest: true
