@@ -7,7 +7,13 @@ on:
 
 jobs:
   build:
-    runs-on: [windows-latest, macos-latest, ubuntu-latest]
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: "actions/checkout@v4"
@@ -36,7 +42,7 @@ jobs:
             build/*.exe
             build/*.bin
             build/*.app/**/*
-
+#
 #  release:
 #    needs: build
 #    runs-on: ubuntu-latest
@@ -53,5 +59,10 @@ jobs:
 #        uses: actions/download-artifact@v4
 #        with:
 #          name: Linux Build
+#      - name: Compress with Zip
+#        run: |
+#          tar -C sample-macos -pczvf sample-macos.tar.gz sample
+#          tar -C sample-linux -pczvf sample-linux.tar.gz sample
+#          zip --junk-paths sample-windows ./sample-windows/sample.exe
 #      - name: Create Release
 #        uses: softprops/action-gh-release@v2
