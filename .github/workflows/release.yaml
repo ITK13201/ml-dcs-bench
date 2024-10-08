@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+env:
+  project_name: ml-dcs-bench
+
 jobs:
   build:
     strategy:
@@ -41,28 +44,37 @@ jobs:
           path: |
             build/*.exe
             build/*.bin
-            build/*.app/**/*
-#
-#  release:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download Windows Build
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: Windows Build
-#      - name: Download MacOS Build
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: macOS Build
-#      - name: Download Linux Build
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: Linux Build
-#      - name: Compress with Zip
-#        run: |
-#          tar -C sample-macos -pczvf sample-macos.tar.gz sample
-#          tar -C sample-linux -pczvf sample-linux.tar.gz sample
-#          zip --junk-paths sample-windows ./sample-windows/sample.exe
-#      - name: Create Release
-#        uses: softprops/action-gh-release@v2
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows Build
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows Build
+          path: ./windows/${{ env.project_name }}.exe
+      - name: Download MacOS Build
+        uses: actions/download-artifact@v4
+        with:
+          name: macOS Build
+          path: ./macos/${{ env.project_name }}
+      - name: Download Linux Build
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux Build
+          path: ./linux/${{ env.project_name }}
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Compress
+        run: |
+          tar -C ./windows -pczvf ${{ env.project_name }}_${{ github.ref_name }}_windows_amd64.tar.gz ${{ env.project_name }}.exe
+          tar -C ./macos -pczvf ${{ env.project_name }}_${{ github.ref_name }}_macos_amd64.tar.gz ${{ env.project_name }}
+          tar -C ./linux -pczvf ${{ env.project_name }}_${{ github.ref_name }}_linux_amd64.tar.gz ${{ env.project_name }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.project_name }}_${{ github.ref_name }}_windows_amd64.tar.gz
+            ${{ env.project_name }}_${{ github.ref_name }}_macos_amd64.tar.gz
+            ${{ env.project_name }}_${{ github.ref_name }}_linux_amd64.tar.gz
