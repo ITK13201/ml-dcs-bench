@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: "actions/checkout@v4"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "x64"
+      - name: Install Python dependencies
+        working-directory: ./ml-dcs-bench
+        run: |
+          pip install -U pip
+          pip install pipenv
+          pipenv install --system --deploy --ignore-pipfile
+      - name: Build Executable with Nuitka
+        uses: Nuitka/Nuitka-Action@main
+        with:
+         nuitka-version: main
+         script-name: ./ml-dcs-bench/main.py
+         onefile: true
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }} Build
+          path: |
+            build/*.exe
+            build/*.bin
+            build/*.app/**/*
+
+#  release:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Download Windows Build
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: Windows Build
+#      - name: Download MacOS Build
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: macOS Build
+#      - name: Download Linux Build
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: Linux Build
+#      - name: Create Release
+#        uses: softprops/action-gh-release@v2
