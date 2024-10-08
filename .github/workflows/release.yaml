@@ -85,3 +85,4 @@ jobs:
             ${{ env.project_name }}_${{ github.ref_name }}_linux_amd64.tar.gz
           generate_release_notes: true
           make_latest: true
+          token: ${{ secrets.PAT }}
