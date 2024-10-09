@@ -2,11 +2,11 @@ import argparse
 from typing import Type
 
 from ml_dcs_bench.cmd.base import BaseCommand
-from ml_dcs_bench.cmd.create_testcase import CreateTestCaseCommand
+from ml_dcs_bench.cmd.create_testcases import CreateTestCasesCommand
 
 
 class RootCommand:
-    description = "Script for benchmark testing."
+    description = "Benchmark scripts for ml-dcs"
     parser = argparse.ArgumentParser(description=description)
     subparsers = parser.add_subparsers(dest="command")
 
@@ -17,7 +17,7 @@ class RootCommand:
         subparser.set_defaults(handler=command.execute)
 
     def __init__(self):
-        self.add_command(CreateTestCaseCommand)
+        self.add_command(CreateTestCasesCommand)
 
     def execute(self):
         args = self.parser.parse_args()
