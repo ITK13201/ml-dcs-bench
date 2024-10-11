@@ -77,6 +77,7 @@ DEFAULT_LTS_COMPONENTS = [
     "KIVA_system（N, 3 robot）",
     "KIVA_system（N, 4 robot）",
     "KIVA_system（S, 5 pod）",
+    "KIVA_system（S, 10 pod）",
     "KIVA_system（S, 20 pod）",
     "KIVA_system（S, 30 pod）",
 ]
@@ -200,7 +201,7 @@ class CreateTestCasesCommand(BaseCommand):
     def _choice_combinations_randomly(self, iterable: Iterable) -> List[List[str]]:
         s = list(iterable)
         length = len(s)
-        if 2 ** length - 1 < NUMBER_OF_ITEMS_TO_BE_RANDOMLY_SELECTED:
+        if 2**length - 1 < NUMBER_OF_ITEMS_TO_BE_RANDOMLY_SELECTED:
             raise RuntimeError("Not enough items selected")
 
         selected_numbers = set()
