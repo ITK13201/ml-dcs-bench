@@ -1,0 +1,3 @@
+//Traditional Synthesis
+||Environment = (KIVA_System).
+controller ||TraditionalController = (Environment)~{Specification}.
