@@ -1,0 +1,12 @@
+name: Goal
+safety:
+  - NOT_CAPTURE_00
+  - NOT_CAPTURE_01
+  - NOT_CAPTURE_02
+  - NOT_CAPTURE_03
+  - NOT_CAPTURE_04
+controllable:
+  - "mouse[0..Mice-1].move[Area]"
+marking:
+  - safe
+nonblocking: true

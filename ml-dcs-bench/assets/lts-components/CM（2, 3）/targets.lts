@@ -1,0 +1,5 @@
+||Environment = (forall [m:0..Mice-1] Mouse(m) || forall [c:0..Cats-1] Cat(c)).
+
+controller ||TraditionalController = (Environment)~{Goal}.
+controller ||MonolithicController = (forall [m:0..Mice-1] Mouse(m) || forall [c:0..Cats-1] Cat(c))~{Goal}.
+heuristic  ||DirectedController = (forall [m:0..Mice-1] Mouse(m) || forall [c:0..Cats-1] Cat(c))~{Goal}.
