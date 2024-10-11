@@ -1,4 +1,4 @@
-const PodNum   = 30
+const PodNum   = 10
 const RobotNum = 1
 
 range PodID   = 1..PodNum
