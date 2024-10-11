@@ -1,0 +1,12 @@
+name: Goal
+safety:
+  - CONDITION_REFUSE
+  - CONDITION_APPROVE
+controllable:
+  - "assign[Team]"
+  - refuse
+  - approve
+marking:
+  - refuse
+  - approve
+nonblocking: true
