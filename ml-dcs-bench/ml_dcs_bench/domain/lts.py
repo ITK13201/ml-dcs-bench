@@ -8,7 +8,7 @@ class ControllerSpec(BaseModel):
     safety: List[str] = []
     controllable: List[str] = []
     marking: List[str] = []
-    nonblocking: bool
+    nonblocking: bool = False
 
     model_config = ConfigDict()
 

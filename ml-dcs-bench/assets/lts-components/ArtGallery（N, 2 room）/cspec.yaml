@@ -1,0 +1,16 @@
+name: Specification
+safety:
+  - P_VISITOR_RULE_HALL
+  - P_LOCK_RULE_HALL1
+  - P_LOCK_RULE_HALL2
+  - P_UNLOCK_RULE_HALL1
+  - P_HALL_LOCK_TIMING
+  - P_HALL_UNLOCK_TIMING
+  - P_VISITOR_RULE_A
+  - P_LOCK_RULE_A1
+  - P_LOCK_RULE_A2
+  - P_UNLOCK_RULE_A1
+  - P_A_LOCK_TIMING
+  - P_A_UNLOCK_TIMING
+controllable:
+  - ControllableActions

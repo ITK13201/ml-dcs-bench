@@ -12,7 +12,19 @@ from ml_dcs_bench.domain.lts import ControllerSpec
 logger = getLogger(__name__)
 
 LTS_COMPONENTS_BASE_DIR = os.path.join("assets", "lts-components")
-DEFAULT_LTS_COMPONENTS = ["AT（2, 2）"]
+DEFAULT_LTS_COMPONENTS = [
+    "AT（2, 2）",
+    "AT（2, 3）",
+    "AT（2, 4）",
+    # "AT（2, 5）",
+    # "AT（3, 3）",
+    # "AT（3, 4）",
+    # "AT（3, 5）",
+    # "AT（4, 4）",
+    # "AT（4, 5）",
+    # "AT（5, 5）",
+    # "AT（5, 10）",
+]
 DEFAULT_OUTPUT_DIR = os.path.join("tmp", "output")
 
 
@@ -144,12 +156,13 @@ class CreateTestCasesCommand(BaseCommand):
         result.append("{}}}".format("\t" * indent))
 
         # marking
-        result.append("{}marking = {{".format("\t" * indent))
-        indent += 1
-        for controllable_action in controller_spec.controllable:
-            result.append("{}{},".format("\t" * indent, controllable_action))
-        indent -= 1
-        result.append("{}}}".format("\t" * indent))
+        if controller_spec.marking:
+            result.append("{}marking = {{".format("\t" * indent))
+            indent += 1
+            for controllable_action in controller_spec.controllable:
+                result.append("{}{},".format("\t" * indent, controllable_action))
+            indent -= 1
+            result.append("{}}}".format("\t" * indent))
 
         # nonblocking
         if controller_spec.nonblocking:

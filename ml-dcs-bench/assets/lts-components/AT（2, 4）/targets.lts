@@ -1,0 +1,5 @@
+||Environment = (forall [p:Plane]  Airplane(p) || ResponseMonitor).
+
+controller ||TraditionalController = (Environment)~{Goal}.
+controller ||MonolithicController = (forall [p:Plane]  Airplane(p) || ResponseMonitor)~{Goal}.
+heuristic ||DirectedController = (forall [p:Plane]  Airplane(p) || ResponseMonitor)~{Goal}.

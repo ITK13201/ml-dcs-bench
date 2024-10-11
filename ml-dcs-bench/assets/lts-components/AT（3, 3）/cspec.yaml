@@ -1,0 +1,18 @@
+name: Goal
+safety:
+  - HeightMonitor_00
+  - HeightMonitor_01
+  - HeightMonitor_02
+  - HeightMonitor_10
+  - HeightMonitor_11
+  - HeightMonitor_12
+  - HeightMonitor_20
+  - HeightMonitor_21
+  - HeightMonitor_22
+  - RampMonitor
+controllable:
+  - "descend[Plane][Height]"
+  - "approach[Plane]"
+marking:
+  - control.all
+nonblocking: true

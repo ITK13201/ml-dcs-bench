@@ -1,0 +1,59 @@
+name: Goal
+safety:
+  - HeightMonitor_00
+  - HeightMonitor_01
+  - HeightMonitor_02
+  - HeightMonitor_03
+  - HeightMonitor_04
+  - HeightMonitor_05
+  - HeightMonitor_06
+  - HeightMonitor_07
+  - HeightMonitor_08
+  - HeightMonitor_09
+  - HeightMonitor_10
+  - HeightMonitor_11
+  - HeightMonitor_12
+  - HeightMonitor_13
+  - HeightMonitor_14
+  - HeightMonitor_15
+  - HeightMonitor_16
+  - HeightMonitor_17
+  - HeightMonitor_18
+  - HeightMonitor_19
+  - HeightMonitor_20
+  - HeightMonitor_21
+  - HeightMonitor_22
+  - HeightMonitor_23
+  - HeightMonitor_24
+  - HeightMonitor_25
+  - HeightMonitor_26
+  - HeightMonitor_27
+  - HeightMonitor_28
+  - HeightMonitor_29
+  - HeightMonitor_30
+  - HeightMonitor_31
+  - HeightMonitor_32
+  - HeightMonitor_33
+  - HeightMonitor_34
+  - HeightMonitor_35
+  - HeightMonitor_36
+  - HeightMonitor_37
+  - HeightMonitor_38
+  - HeightMonitor_39
+  - HeightMonitor_40
+  - HeightMonitor_41
+  - HeightMonitor_42
+  - HeightMonitor_43
+  - HeightMonitor_44
+  - HeightMonitor_45
+  - HeightMonitor_46
+  - HeightMonitor_47
+  - HeightMonitor_48
+  - HeightMonitor_49
+  - RampMonitor
+controllable:
+  - "descend[Plane][Height]"
+  - "approach[Plane]"
+marking:
+  - control.all
+nonblocking: true
