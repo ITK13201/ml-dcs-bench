@@ -25,3 +25,5 @@ run:
 		--mtsa-jar-path $(MTSA_JAR_PATH) \
 		--memory-size $(MEMORY_SIZE) \
 		--mtsa-target $(MTSA_TARGET)
+create:
+	pipenv run python main.py create_testcases -O

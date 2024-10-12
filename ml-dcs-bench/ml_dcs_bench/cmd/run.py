@@ -263,6 +263,7 @@ class RunCommand(BaseCommand):
             lts_file_paths = glob.glob(
                 os.path.join(self.input_dir, "{}*.lts".format(lts_name)), recursive=True
             )
+            lts_file_paths = sorted(lts_file_paths)
 
             for lts_file_path in lts_file_paths:
                 logger.info("Started to execute: {}".format(lts_file_path))
@@ -281,12 +282,15 @@ class RunCommand(BaseCommand):
                     "-Xmx{}G".format(args.memory_size),
                     "-jar",
                     args.mtsa_jar_path,
+                    "compose",
                     "-f",
                     lts_file_path,
                     "-t",
                     args.mtsa_target,
                     "-o",
                     self.output_dir,
+                    "-m",
+                    "enabled",
                 ]
                 logger.info("running command: {}".format(" ".join(command)))
 
@@ -310,7 +314,10 @@ class RunCommand(BaseCommand):
                 self.result.tasks.append(task_result)
 
                 # sleep
-                time.sleep(self.sleep_time)
+                if task_result.duration < datetime.timedelta(minutes=1):
+                    time.sleep(1)
+                else:
+                    time.sleep(self.sleep_time)
 
         now = datetime.datetime.now()
         self.result.finished_at = now
