@@ -5,10 +5,10 @@ from pydantic import BaseModel, ConfigDict, field_serializer
 
 
 class RunResultTask(BaseModel):
-    name: str
-    success: bool
-    started_at: datetime
-    finished_at: datetime
+    name: str = ""
+    success: bool = False
+    started_at: datetime = None
+    finished_at: datetime = None
 
     @field_serializer("started_at")
     def serialize_started_at(self, value: datetime) -> str:
@@ -20,8 +20,8 @@ class RunResultTask(BaseModel):
 
 
 class RunResult(BaseModel):
-    started_at: datetime
-    finished_at: datetime
+    started_at: datetime = None
+    finished_at: datetime = None
 
     tasks: List[RunResultTask] = []
 

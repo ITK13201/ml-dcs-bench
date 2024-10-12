@@ -81,7 +81,7 @@ DEFAULT_LTS_COMPONENTS = [
     "KIVA_system（S, 20 pod）",
     "KIVA_system（S, 30 pod）",
 ]
-DEFAULT_OUTPUT_DIR = os.path.join("tmp", "output")
+DEFAULT_OUTPUT_DIR = os.path.join("tmp", "testcases")
 NUMBER_OF_ITEMS_TO_BE_RANDOMLY_SELECTED = 200
 
 
@@ -252,16 +252,22 @@ class CreateTestCasesCommand(BaseCommand):
         # safety
         result.append("{}safety = {{".format("\t" * indent))
         indent += 1
-        for safety_property in controller_spec.safety:
-            result.append("{}{},".format("\t" * indent, safety_property))
+        for index, safety_property in enumerate(controller_spec.safety):
+            if index != len(controller_spec.safety) - 1:
+                result.append("{}{},".format("\t" * indent, safety_property))
+            else:
+                result.append("{}{}".format("\t" * indent, safety_property))
         indent -= 1
         result.append("{}}}".format("\t" * indent))
 
         # controllable
         result.append("{}controllable = {{".format("\t" * indent))
         indent += 1
-        for controllable_action in controller_spec.controllable:
-            result.append("{}{},".format("\t" * indent, controllable_action))
+        for index, controllable_action in enumerate(controller_spec.controllable):
+            if index != len(controller_spec.controllable) - 1:
+                result.append("{}{},".format("\t" * indent, controllable_action))
+            else:
+                result.append("{}{}".format("\t" * indent, controllable_action))
         indent -= 1
         result.append("{}}}".format("\t" * indent))
 
@@ -269,8 +275,11 @@ class CreateTestCasesCommand(BaseCommand):
         if controller_spec.marking:
             result.append("{}marking = {{".format("\t" * indent))
             indent += 1
-            for controllable_action in controller_spec.controllable:
-                result.append("{}{},".format("\t" * indent, controllable_action))
+            for index, marking_action in enumerate(controller_spec.marking):
+                if index != len(controller_spec.marking) - 1:
+                    result.append("{}{},".format("\t" * indent, marking_action))
+                else:
+                    result.append("{}{}".format("\t" * indent, marking_action))
             indent -= 1
             result.append("{}}}".format("\t" * indent))
 

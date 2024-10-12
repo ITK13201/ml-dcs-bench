@@ -188,7 +188,7 @@ class RunCommand(BaseCommand):
             "--sleep-time",
             type=int,
             required=False,
-            help="Sleep time in seconds",
+            help="Sleep time (seconds)",
             default=10,
         )
 
@@ -276,20 +276,23 @@ class RunCommand(BaseCommand):
                     self.log_dir,
                     lts_file_basename + ".log",
                 )
+                command = [
+                    "java",
+                    "-Xmx{}G".format(args.memory_size),
+                    "-jar",
+                    args.mtsa_jar_path,
+                    "-f",
+                    lts_file_path,
+                    "-t",
+                    args.mtsa_target,
+                    "-o",
+                    self.output_dir,
+                ]
+                logger.info("running command: {}".format(" ".join(command)))
+
                 with open(log_file_path, "w") as log_file:
                     process = subprocess.run(
-                        [
-                            "java",
-                            "-Xmx{}G".format(args.memory_size),
-                            "-jar",
-                            args.mtsa_jar_path,
-                            "-f",
-                            lts_file_path,
-                            "-t",
-                            args.mtsa_target,
-                            "-o",
-                            self.output_dir,
-                        ],
+                        command,
                         stdout=log_file,
                         stderr=log_file,
                     )
