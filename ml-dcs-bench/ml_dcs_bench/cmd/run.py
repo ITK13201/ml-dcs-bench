@@ -121,17 +121,17 @@ LTS_NAMES = [
     "ArtGallery（N, 2 room）",
     "ArtGallery（N, 3 room）",
     "ArtGallery（N, 4 room）",
-    "ArtGallery（S, 5 people）",
-    "ArtGallery（S, 6 people）",
     # KiVA_system
     "KIVA_system（N, 2 robot）",
     "KIVA_system（N, 3 robot）",
     "KIVA_system（N, 4 robot）",
     "KIVA_system（S, 5 pod）",
     "KIVA_system（S, 10 pod）",
-    # Succeeded but log duration
+    # Succeeded but long duration
     "CM（3, 4）",
     "ArtGallery（N, 5 room）",
+    "ArtGallery（S, 5 people）",
+    "ArtGallery（S, 6 people）",
     "KIVA_system（S, 20 pod）",
     # Failed
     "CM（3, 5）",
@@ -259,79 +259,80 @@ class RunCommand(BaseCommand):
 
         self.result.started_at = now
 
-        for lts_name in LTS_NAMES:
-            lts_file_paths = glob.glob(
-                os.path.join(self.input_dir, "{}*.lts".format(lts_name)), recursive=True
-            )
-            lts_file_paths = sorted(lts_file_paths)
-
-            for lts_file_path in lts_file_paths:
-                logger.info("Started to execute: {}".format(lts_file_path))
-
-                lts_file_basename = os.path.splitext(os.path.basename(lts_file_path))[0]
-
-                now = datetime.datetime.now()
-                task_result = RunResultTask(name=lts_file_basename, started_at=now)
-
-                log_file_path = os.path.join(
-                    self.log_dir,
-                    lts_file_basename + ".log",
+        try:
+            for lts_name in LTS_NAMES:
+                lts_file_paths = glob.glob(
+                    os.path.join(self.input_dir, "{}*.lts".format(lts_name)), recursive=True
                 )
-                command = [
-                    "java",
-                    "-Xmx{}G".format(args.memory_size),
-                    "-jar",
-                    args.mtsa_jar_path,
-                    "compose",
-                    "-f",
-                    lts_file_path,
-                    "-t",
-                    args.mtsa_target,
-                    "-o",
-                    self.output_dir,
-                    "-m",
-                    "enabled",
-                ]
-                logger.info("running command: {}".format(" ".join(command)))
+                lts_file_paths = sorted(lts_file_paths)
 
-                with open(log_file_path, "w") as log_file:
-                    process = subprocess.run(
-                        command,
-                        stdout=log_file,
-                        stderr=log_file,
+                for lts_file_path in lts_file_paths:
+                    logger.info("Started to execute: {}".format(lts_file_path))
+
+                    lts_file_basename = os.path.splitext(os.path.basename(lts_file_path))[0]
+
+                    now = datetime.datetime.now()
+                    task_result = RunResultTask(name=lts_file_basename, started_at=now)
+
+                    log_file_path = os.path.join(
+                        self.log_dir,
+                        lts_file_basename + ".log",
                     )
+                    command = [
+                        "java",
+                        "-Xmx{}G".format(args.memory_size),
+                        "-jar",
+                        args.mtsa_jar_path,
+                        "compose",
+                        "-f",
+                        lts_file_path,
+                        "-t",
+                        args.mtsa_target,
+                        "-o",
+                        self.output_dir,
+                        "-m",
+                        "enabled",
+                    ]
+                    logger.info("running command: {}".format(" ".join(command)))
 
-                now = datetime.datetime.now()
-                task_result.finished_at = now
+                    with open(log_file_path, "w") as log_file:
+                        process = subprocess.run(
+                            command,
+                            stdout=log_file,
+                            stderr=log_file,
+                        )
 
-                if process.returncode == 0:
-                    task_result.success = True
-                    logger.info("Finished to execute: {}".format(lts_file_path))
-                else:
-                    task_result.success = False
-                    logger.error("Failed to execute: {}".format(lts_file_path))
+                    now = datetime.datetime.now()
+                    task_result.finished_at = now
 
-                self.result.tasks.append(task_result)
+                    if process.returncode == 0:
+                        task_result.success = True
+                        logger.info("Finished to execute: {}".format(lts_file_path))
+                    else:
+                        task_result.success = False
+                        logger.error("Failed to execute: {}".format(lts_file_path))
 
-                # sleep
-                if task_result.duration < datetime.timedelta(minutes=1):
-                    time.sleep(1)
-                else:
-                    time.sleep(self.sleep_time)
+                    self.result.tasks.append(task_result)
 
-        now = datetime.datetime.now()
-        self.result.finished_at = now
+                    # sleep
+                    if task_result.duration < datetime.timedelta(minutes=1):
+                        time.sleep(1)
+                    else:
+                        time.sleep(self.sleep_time)
+        finally:
+            now = datetime.datetime.now()
+            self.result.finished_at = now
 
-        result_json = self.result.model_dump_json(indent=2)
-        with open(
-            os.path.join(
-                self.output_base_dir,
-                "result_{}.json".format(
-                    self.result.started_at.strftime("%Y%m%d-%H%M%S")
+            result_json = self.result.model_dump_json(indent=2)
+            with open(
+                os.path.join(
+                    self.output_base_dir,
+                    "result_{}.json".format(
+                        self.result.started_at.strftime("%Y%m%d-%H%M%S")
+                    ),
                 ),
-            ),
-            "w",
-        ) as f:
-            f.write(result_json)
+                "w",
+            ) as f:
+                f.write(result_json)
 
         logger.info("RunCommand finished")
