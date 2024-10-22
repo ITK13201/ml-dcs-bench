@@ -5,6 +5,7 @@ import os.path
 import subprocess
 import time
 from logging import getLogger
+from typing import List
 
 import psutil
 
@@ -210,6 +211,14 @@ class RunCommand(BaseCommand):
             help="Memory size (GB)",
             default=225,
         )
+        parser.add_argument(
+            "--extra-java-args",
+            type=str,
+            action="append",
+            default=[],
+            required=False,
+            help="Extra java args",
+        )
 
         # MTSA arguments
         parser.add_argument(
@@ -219,6 +228,14 @@ class RunCommand(BaseCommand):
             required=False,
             help="MTSA Target name",
             default="TraditionalController",
+        )
+        parser.add_argument(
+            "--extra-mtsa-args",
+            type=str,
+            action="append",
+            default=[],
+            required=False,
+            help="Extra mtsa args",
         )
 
     def __init__(self):
@@ -232,6 +249,8 @@ class RunCommand(BaseCommand):
         self.mtsa_jar_path: str = ""
         self.memory_size: int = -1
         self.mtsa_target: str = ""
+        self.extra_java_args: List[str] = []
+        self.extra_mtsa_args: List[str] = []
 
         # others
         self.output_dir = ""
@@ -248,6 +267,8 @@ class RunCommand(BaseCommand):
         self.mtsa_jar_path = args.mtsa_jar_path
         self.memory_size = args.memory_size
         self.mtsa_target = args.mtsa_target
+        self.extra_java_args = args.extra_java_args
+        self.extra_mtsa_args = args.extra_mtsa_args
 
         now = datetime.datetime.now()
         self.output_dir = os.path.join(
@@ -283,9 +304,11 @@ class RunCommand(BaseCommand):
                         self.log_dir,
                         lts_file_basename + ".log",
                     )
-                    command = [
+                    command_java = [
                         "java",
                         "-Xmx{}G".format(args.memory_size),
+                    ]
+                    command_mtsa = [
                         "-jar",
                         args.mtsa_jar_path,
                         "compose",
@@ -298,6 +321,11 @@ class RunCommand(BaseCommand):
                         "-m",
                         "for-machine-learning",
                     ]
+                    if self.extra_java_args:
+                        command_java.extend(self.extra_java_args)
+                    if self.extra_mtsa_args:
+                        command_mtsa.extend(self.extra_mtsa_args)
+                    command = command_java + command_mtsa
                     logger.info("running command: {}".format(" ".join(command)))
 
                     with open(log_file_path, "w") as log_file:
