@@ -9,6 +9,7 @@ class RunResultTask(BaseModel):
     success: bool = False
     started_at: datetime = None
     finished_at: datetime = None
+    max_memory_usage: float = -1
 
     @field_serializer("started_at")
     def serialize_started_at(self, value: datetime) -> str:

@@ -6,6 +6,8 @@ import subprocess
 import time
 from logging import getLogger
 
+import psutil
+
 from ml_dcs_bench.cmd.base import BaseCommand
 from ml_dcs_bench.domain.result import RunResult, RunResultTask
 
@@ -262,14 +264,17 @@ class RunCommand(BaseCommand):
         try:
             for lts_name in LTS_NAMES:
                 lts_file_paths = glob.glob(
-                    os.path.join(self.input_dir, "{}*.lts".format(lts_name)), recursive=True
+                    os.path.join(self.input_dir, "{}*.lts".format(lts_name)),
+                    recursive=True,
                 )
                 lts_file_paths = sorted(lts_file_paths)
 
                 for lts_file_path in lts_file_paths:
                     logger.info("Started to execute: {}".format(lts_file_path))
 
-                    lts_file_basename = os.path.splitext(os.path.basename(lts_file_path))[0]
+                    lts_file_basename = os.path.splitext(
+                        os.path.basename(lts_file_path)
+                    )[0]
 
                     now = datetime.datetime.now()
                     task_result = RunResultTask(name=lts_file_basename, started_at=now)
@@ -296,12 +301,25 @@ class RunCommand(BaseCommand):
                     logger.info("running command: {}".format(" ".join(command)))
 
                     with open(log_file_path, "w") as log_file:
-                        process = subprocess.run(
+                        process = subprocess.Popen(
                             command,
                             stdout=log_file,
                             stderr=log_file,
                         )
+                        pid = process.pid
+                        ps_process = psutil.Process(pid)
+                        max_memory_usage_kib = -1
 
+                        while process.poll() is None:
+                            memory_info = ps_process.memory_info()
+                            memory_usage_kib = memory_info.rss / 1024
+                            if memory_usage_kib > max_memory_usage_kib:
+                                max_memory_usage_kib = memory_usage_kib
+                            time.sleep(0.1)
+
+                        process.wait()
+
+                    task_result.max_memory_usage = max_memory_usage_kib
                     now = datetime.datetime.now()
                     task_result.finished_at = now
 
