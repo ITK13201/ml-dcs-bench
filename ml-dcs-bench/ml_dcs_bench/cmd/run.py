@@ -291,7 +291,7 @@ class RunCommand(BaseCommand):
                         "-o",
                         self.output_dir,
                         "-m",
-                        "enabled",
+                        "for-machine-learning",
                     ]
                     logger.info("running command: {}".format(" ".join(command)))
 
