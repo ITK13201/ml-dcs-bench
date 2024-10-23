@@ -262,6 +262,7 @@ class RunCommand(BaseCommand):
 
         # others
         self.output_dir = ""
+        self.input_models_output_dir = ""
         self.log_dir = ""
         self.result = RunResult()
 
@@ -283,10 +284,12 @@ class RunCommand(BaseCommand):
         self.output_dir = os.path.join(
             self.output_base_dir, now.strftime("%Y%m%d-%H%M%S")
         )
+        self.input_models_output_dir = os.path.join(self.output_dir, "input-models")
         self.log_dir = os.path.join(self.log_base_dir, now.strftime("%Y%m%d-%H%M%S"))
 
         # create dirs
         os.mkdir(self.output_dir)
+        os.mkdir(self.input_models_output_dir)
         os.mkdir(self.log_dir)
 
         self.result.started_at = now
