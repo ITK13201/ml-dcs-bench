@@ -369,7 +369,7 @@ class RunCommand(BaseCommand):
             now = datetime.datetime.now()
             self.result.finished_at = now
 
-            result_json = self.result.model_dump_json(indent=2)
+            result_json = self.result.model_dump_json(by_alias=True, indent=2)
             with open(
                 os.path.join(
                     self.output_base_dir,
