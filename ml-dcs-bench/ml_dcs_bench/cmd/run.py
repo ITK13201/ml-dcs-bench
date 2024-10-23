@@ -194,6 +194,13 @@ class RunCommand(BaseCommand):
             help="Sleep time (seconds)",
             default=10,
         )
+        parser.add_argument(
+            "-S",
+            "--skip-to",
+            type=str,
+            required=False,
+            help="Skip to specified testcase",
+        )
 
         # Java arguments
         parser.add_argument(
@@ -246,10 +253,11 @@ class RunCommand(BaseCommand):
         self.output_base_dir: str = ""
         self.log_base_dir: str = ""
         self.sleep_time: int = -1
+        self.skip_to: str = ""
         self.mtsa_jar_path: str = ""
         self.memory_size: int = -1
-        self.mtsa_target: str = ""
         self.extra_java_args: List[str] = []
+        self.mtsa_target: str = ""
         self.extra_mtsa_args: List[str] = []
 
         # others
@@ -264,10 +272,11 @@ class RunCommand(BaseCommand):
         self.output_base_dir = args.output_base_dir
         self.log_base_dir = args.log_base_dir
         self.sleep_time = args.sleep_time
+        self.skip_to = args.skip_to
         self.mtsa_jar_path = args.mtsa_jar_path
         self.memory_size = args.memory_size
-        self.mtsa_target = args.mtsa_target
         self.extra_java_args = args.extra_java_args
+        self.mtsa_target = args.mtsa_target
         self.extra_mtsa_args = args.extra_mtsa_args
 
         now = datetime.datetime.now()
@@ -284,6 +293,10 @@ class RunCommand(BaseCommand):
 
         try:
             for lts_name in LTS_NAMES:
+                if self.skip_to is not None:
+                    if not lts_name.startswith(self.skip_to):
+                        continue
+
                 lts_file_paths = glob.glob(
                     os.path.join(self.input_dir, "{}*.lts".format(lts_name)),
                     recursive=True,
