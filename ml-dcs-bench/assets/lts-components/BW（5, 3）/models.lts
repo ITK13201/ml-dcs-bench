@@ -82,4 +82,4 @@ fluent REFUSE_PROCESS = <reject[Team][Steps],arriveDocument>
 ltl_property CONDITION_REFUSE  = [](REFUSE_PROCESS -> !approve)
 ltl_property CONDITION_APPROVE = [](!REFUSE_PROCESS -> !refuse)
 
-||Plant = (forall [id:Team] Team(id)).
+||Environment = (forall [id:Team] Team(id)).
