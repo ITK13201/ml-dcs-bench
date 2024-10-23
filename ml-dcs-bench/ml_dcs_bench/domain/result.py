@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List
 
-from pydantic import BaseModel, ConfigDict, computed_field, field_serializer
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_serializer
 
 
 class RunResultTask(BaseModel):
@@ -9,7 +9,7 @@ class RunResultTask(BaseModel):
     success: bool = False
     started_at: datetime = None
     finished_at: datetime = None
-    max_memory_usage: float = -1
+    max_memory_usage: float = Field(alias="max_memory_usage [KiB]", default=-1)
 
     @field_serializer("started_at")
     def serialize_started_at(self, value: datetime) -> str:
