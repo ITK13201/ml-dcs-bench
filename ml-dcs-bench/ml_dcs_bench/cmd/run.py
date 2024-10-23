@@ -342,7 +342,7 @@ class RunCommand(BaseCommand):
                     logger.info("running command: {}".format(" ".join(command)))
 
                     os_initial_used_memory_kib = self._get_os_used_memory_kib()
-                    calculated_max_memory_usage_kib = -1
+                    max_memory_usage_kib = -1
 
                     with open(log_file_path, "w") as log_file:
                         process = subprocess.Popen(
@@ -350,38 +350,20 @@ class RunCommand(BaseCommand):
                             stdout=log_file,
                             stderr=log_file,
                         )
-                        pid = process.pid
-                        ps_process = psutil.Process(pid)
-                        max_memory_usage_kib = -1
 
                         while process.poll() is None:
-                            # memory info by pid
-                            process_memory_info = ps_process.memory_info()
-                            process_memory_usage_kib = process_memory_info.rss / 1024
-                            if process_memory_usage_kib > max_memory_usage_kib:
-                                max_memory_usage_kib = process_memory_usage_kib
-
-                            # memory info by calculation
                             os_current_used_memory_kib = self._get_os_used_memory_kib()
-                            calculated_memory_usage_kib = (
+                            memory_usage_kib = (
                                 os_current_used_memory_kib - os_initial_used_memory_kib
                             )
-                            if (
-                                calculated_memory_usage_kib
-                                > calculated_max_memory_usage_kib
-                            ):
-                                calculated_max_memory_usage_kib = (
-                                    calculated_memory_usage_kib
-                                )
+                            if memory_usage_kib > max_memory_usage_kib:
+                                max_memory_usage_kib = memory_usage_kib
 
                             time.sleep(0.1)
 
                         process.wait()
 
                     task_result.max_memory_usage = max_memory_usage_kib
-                    task_result.calculated_max_memory_usage = (
-                        calculated_max_memory_usage_kib
-                    )
                     now = datetime.datetime.now()
                     task_result.finished_at = now
 
@@ -411,7 +393,8 @@ class RunCommand(BaseCommand):
                         self.result.started_at.strftime("%Y%m%d-%H%M%S")
                     ),
                 ),
-                "w",
+                mode="w",
+                encoding="utf-8",
             ) as f:
                 f.write(result_json)
 
