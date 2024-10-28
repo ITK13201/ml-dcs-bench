@@ -229,12 +229,26 @@ class RunCommand(BaseCommand):
 
         # MTSA arguments
         parser.add_argument(
+            "-c",
+            "--mtsa-command",
+            type=str,
+            required=True,
+            help="MTSA command",
+        )
+        parser.add_argument(
             "-t",
             "--mtsa-target",
             type=str,
             required=False,
             help="MTSA Target name",
             default="TraditionalController",
+        )
+        parser.add_argument(
+            "-M",
+            "--mtsa-result-mode",
+            type=str,
+            required=True,
+            help="MTSA result mode",
         )
         parser.add_argument(
             "--extra-mtsa-args",
@@ -257,7 +271,9 @@ class RunCommand(BaseCommand):
         self.mtsa_jar_path: str = ""
         self.memory_size: int = -1
         self.extra_java_args: List[str] = []
+        self.mtsa_command: str = ""
         self.mtsa_target: str = ""
+        self.mtsa_result_mode: str = ""
         self.extra_mtsa_args: List[str] = []
 
         # others
@@ -277,7 +293,9 @@ class RunCommand(BaseCommand):
         self.mtsa_jar_path = args.mtsa_jar_path
         self.memory_size = args.memory_size
         self.extra_java_args = args.extra_java_args
+        self.mtsa_command = args.mtsa_command
         self.mtsa_target = args.mtsa_target
+        self.mtsa_result_mode = args.mtsa_result_mode
         self.extra_mtsa_args = args.extra_mtsa_args
 
         now = datetime.datetime.now()
@@ -326,16 +344,16 @@ class RunCommand(BaseCommand):
                     ]
                     command_mtsa = [
                         "-jar",
-                        args.mtsa_jar_path,
-                        "compose",
+                        self.mtsa_jar_path,
+                        self.mtsa_command,
                         "-f",
                         lts_file_path,
                         "-t",
-                        args.mtsa_target,
+                        self.mtsa_target,
                         "-o",
                         self.output_dir,
                         "-m",
-                        "for-machine-learning",
+                        self.mtsa_result_mode,
                     ]
                     if self.extra_java_args:
                         command_java.extend(self.extra_java_args)
