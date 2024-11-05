@@ -82,7 +82,7 @@ DEFAULT_LTS_COMPONENTS = [
     "KIVA_system（S, 30 pod）",
 ]
 DEFAULT_OUTPUT_DIR = os.path.join("tmp", "testcases")
-NUMBER_OF_ITEMS_TO_BE_RANDOMLY_SELECTED = 500
+NUMBER_OF_ITEMS_TO_BE_RANDOMLY_SELECTED = 200
 
 
 class CreateTestCasesCommand(BaseCommand):

@@ -2,6 +2,7 @@ import argparse
 from typing import Type
 
 from ml_dcs_bench.cmd.base import BaseCommand
+from ml_dcs_bench.cmd.combine_results import CombineResultsCommand
 from ml_dcs_bench.cmd.create_testcases import CreateTestCasesCommand
 from ml_dcs_bench.cmd.run import RunCommand
 
@@ -20,6 +21,7 @@ class RootCommand:
     def __init__(self):
         self.add_command(CreateTestCasesCommand)
         self.add_command(RunCommand)
+        self.add_command(CombineResultsCommand)
 
     def execute(self):
         args = self.parser.parse_args()

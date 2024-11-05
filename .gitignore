@@ -6,5 +6,5 @@
 tmp/
 
 ### Python ###
-__pychache__/
+__pycache__/
 .venv/

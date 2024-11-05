@@ -33,3 +33,7 @@ run:
 		--mtsa-result-mode $(MTSA_RESULT_MODE)
 create:
 	pipenv run python main.py create_testcases -O
+combine:
+	pipenv run python main.py combine_results \
+		--results-dir $(OUTPUT_BASE_DIR) \
+		--output "./tmp/combined-result.json"

@@ -281,6 +281,7 @@ class RunCommand(BaseCommand):
         self.input_models_output_dir = ""
         self.log_dir = ""
         self.result = RunResult()
+        self.is_skiped = False
 
     def execute(self, args: argparse.Namespace):
         logger.info("RunCommand started")
@@ -314,10 +315,6 @@ class RunCommand(BaseCommand):
 
         try:
             for lts_name in LTS_NAMES:
-                if self.skip_to is not None:
-                    if not lts_name.startswith(self.skip_to):
-                        continue
-
                 lts_file_paths = glob.glob(
                     os.path.join(self.input_dir, "{}*.lts".format(lts_name)),
                     recursive=True,
@@ -325,83 +322,94 @@ class RunCommand(BaseCommand):
                 lts_file_paths = sorted(lts_file_paths)
 
                 for lts_file_path in lts_file_paths:
-                    logger.info("Started to execute: {}".format(lts_file_path))
-
                     lts_file_basename = os.path.splitext(
                         os.path.basename(lts_file_path)
                     )[0]
 
-                    now = datetime.datetime.now()
-                    task_result = RunResultTask(name=lts_file_basename, started_at=now)
+                    # skip or not
+                    if self.skip_to is not None and not self.is_skiped:
+                        if lts_file_basename.startswith(self.skip_to):
+                            self.is_skiped = True
 
-                    log_file_path = os.path.join(
-                        self.log_dir,
-                        lts_file_basename + ".log",
-                    )
-                    command_java = [
-                        "java",
-                        "-Xmx{}G".format(args.memory_size),
-                    ]
-                    command_mtsa = [
-                        "-jar",
-                        self.mtsa_jar_path,
-                        self.mtsa_command,
-                        "-f",
-                        lts_file_path,
-                        "-t",
-                        self.mtsa_target,
-                        "-o",
-                        self.output_dir,
-                        "-m",
-                        self.mtsa_result_mode,
-                    ]
-                    if self.extra_java_args:
-                        command_java.extend(self.extra_java_args)
-                    if self.extra_mtsa_args:
-                        command_mtsa.extend(self.extra_mtsa_args)
-                    command = command_java + command_mtsa
-                    logger.info("running command: {}".format(" ".join(command)))
+                    if self.skip_to is None or self.is_skiped:
+                        logger.info("Started to execute: {}".format(lts_file_path))
 
-                    os_initial_used_memory_kib = self._get_os_used_memory_kib()
-                    max_memory_usage_kib = -1
-
-                    with open(log_file_path, "w") as log_file:
-                        process = subprocess.Popen(
-                            command,
-                            stdout=log_file,
-                            stderr=log_file,
+                        now = datetime.datetime.now()
+                        task_result = RunResultTask(
+                            name=lts_file_basename, started_at=now
                         )
 
-                        while process.poll() is None:
-                            os_current_used_memory_kib = self._get_os_used_memory_kib()
-                            memory_usage_kib = (
-                                os_current_used_memory_kib - os_initial_used_memory_kib
+                        log_file_path = os.path.join(
+                            self.log_dir,
+                            lts_file_basename + ".log",
+                        )
+                        command_java = [
+                            "java",
+                            "-Xmx{}G".format(args.memory_size),
+                        ]
+                        command_mtsa = [
+                            "-jar",
+                            self.mtsa_jar_path,
+                            self.mtsa_command,
+                            "-f",
+                            lts_file_path,
+                            "-t",
+                            self.mtsa_target,
+                            "-o",
+                            self.output_dir,
+                            "-m",
+                            self.mtsa_result_mode,
+                        ]
+                        if self.extra_java_args:
+                            command_java.extend(self.extra_java_args)
+                        if self.extra_mtsa_args:
+                            command_mtsa.extend(self.extra_mtsa_args)
+                        command = command_java + command_mtsa
+                        logger.info("running command: {}".format(" ".join(command)))
+
+                        os_initial_used_memory_kib = self._get_os_used_memory_kib()
+                        max_memory_usage_kib = -1
+
+                        with open(log_file_path, "w") as log_file:
+                            process = subprocess.Popen(
+                                command,
+                                stdout=log_file,
+                                stderr=log_file,
                             )
-                            if memory_usage_kib > max_memory_usage_kib:
-                                max_memory_usage_kib = memory_usage_kib
 
-                            time.sleep(0.1)
+                            while process.poll() is None:
+                                os_current_used_memory_kib = (
+                                    self._get_os_used_memory_kib()
+                                )
+                                memory_usage_kib = (
+                                    os_current_used_memory_kib
+                                    - os_initial_used_memory_kib
+                                )
+                                if memory_usage_kib > max_memory_usage_kib:
+                                    max_memory_usage_kib = memory_usage_kib
 
-                        process.wait()
+                                time.sleep(0.1)
 
-                    task_result.max_memory_usage = max_memory_usage_kib
-                    now = datetime.datetime.now()
-                    task_result.finished_at = now
+                            process.wait()
 
-                    if process.returncode == 0:
-                        task_result.success = True
-                        logger.info("Finished to execute: {}".format(lts_file_path))
-                    else:
-                        task_result.success = False
-                        logger.error("Failed to execute: {}".format(lts_file_path))
+                        task_result.max_memory_usage = max_memory_usage_kib
+                        now = datetime.datetime.now()
+                        task_result.finished_at = now
 
-                    self.result.tasks.append(task_result)
+                        if process.returncode == 0:
+                            task_result.success = True
+                            logger.info("Finished to execute: {}".format(lts_file_path))
+                        else:
+                            task_result.success = False
+                            logger.error("Failed to execute: {}".format(lts_file_path))
 
-                    # sleep
-                    if task_result.duration < datetime.timedelta(minutes=1):
-                        time.sleep(1)
-                    else:
-                        time.sleep(self.sleep_time)
+                        self.result.tasks.append(task_result)
+
+                        # sleep
+                        if task_result.duration < datetime.timedelta(minutes=1):
+                            time.sleep(1)
+                        else:
+                            time.sleep(self.sleep_time)
         finally:
             now = datetime.datetime.now()
             self.result.finished_at = now

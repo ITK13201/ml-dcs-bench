@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_serializer
 
@@ -34,11 +34,15 @@ class RunResult(BaseModel):
     model_config = ConfigDict()
 
     @field_serializer("started_at")
-    def serialize_started_at(self, value: datetime) -> str:
+    def serialize_started_at(self, value: datetime) -> Optional[str]:
+        if value is None:
+            return None
         return value.isoformat()
 
     @field_serializer("finished_at")
-    def serialize_finished_at(self, value: datetime) -> str:
+    def serialize_finished_at(self, value: datetime) -> Optional[str]:
+        if value is None:
+            return None
         return value.isoformat()
 
     @computed_field
@@ -62,5 +66,8 @@ class RunResult(BaseModel):
 
     @computed_field
     @property
-    def duration(self) -> timedelta:
-        return self.finished_at - self.started_at
+    def duration(self) -> Optional[timedelta]:
+        if self.started_at and self.finished_at:
+            return self.finished_at - self.started_at
+        else:
+            return None
