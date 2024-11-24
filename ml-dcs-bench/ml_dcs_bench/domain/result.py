@@ -26,8 +26,8 @@ class RunResultTask(BaseModel):
 
 
 class RunResult(BaseModel):
-    started_at: datetime = None
-    finished_at: datetime = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
 
     tasks: List[RunResultTask] = []
 
